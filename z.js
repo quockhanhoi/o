@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Quest Auto Farmer</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a10;
+            --card: #12121a;
+            --border: #252540;
+            --text: #cdd6f4;
+            --text2: #6c7086;
+            --cyan: #89b4fa;
+            --green: #a6e3a1;
+            --yellow: #f9e2af;
+            --red: #f38ba8;
+            --magenta: #cba6f7;
+            --accent: #89b4fa;
+            --radius: 12px;
+            --font: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--cyan);
+            letter-spacing: 2px;
+        }
+        .header .subtitle {
+            color: var(--text2);
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        /* LOGIN SECTION */
+        .login-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .login-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--cyan);
+            font-size: 14px;
+        }
+        .login-row {
+            display: flex;
+            gap: 10px;
+        }
+        .login-row input {
+            flex: 1;
+            padding: 14px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #0a0a10;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 13px;
+            transition: border-color 0.3s;
+        }
+        .login-row input:focus {
+            outline: none;
+            border-color: var(--cyan);
+        }
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            border: none;
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-primary { background: var(--cyan); color: #0a0a10; }
+        .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-danger { background: var(--red); color: #0a0a10; }
+        .btn-danger:hover { opacity: 0.85; }
+        .btn-sm { padding: 8px 16px; font-size: 11px; border-radius: 6px; }
+
+        /* USER INFO */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 25px;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: #0a0a10;
+        }
+        .user-details h3 { color: var(--cyan); font-size: 16px; }
+        .user-details span { color: var(--text2); font-size: 12px; }
+
+        /* STATS */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--cyan);
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+        .stat-card.green .value { color: var(--green); }
+        .stat-card.yellow .value { color: var(--yellow); }
+        .stat-card.red .value { color: var(--red); }
+
+        /* QUEST TABLE */
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--cyan);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .quest-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+        .quest-table th {
+            background: #181825;
+            color: var(--cyan);
+            padding: 14px 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: left;
+        }
+        .quest-table td {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .quest-table tr:hover { background: #181825; }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-running { background: rgba(249, 226, 175, 0.15); color: var(--yellow); }
+        .badge-done { background: rgba(166, 227, 161, 0.15); color: var(--green); }
+        .badge-pending { background: rgba(108, 112, 134, 0.2); color: var(--text2); }
+        .badge-error { background: rgba(243, 139, 168, 0.15); color: var(--red); }
+
+        /* PROGRESS BAR */
+        .progress-bar {
+            height: 6px;
+            background: #181825;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--green);
+            border-radius: 3px;
+            transition: width 1s linear;
+        }
+        .progress-fill.running { background: var(--yellow); }
+
+        /* LOG */
+        .log-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .log-line {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            color: var(--text2);
+        }
+        .log-line.success { color: var(--green); }
+        .log-line.error { color: var(--red); }
+        .log-line.info { color: var(--cyan); }
+
+        .hidden { display: none; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .login-row { flex-direction: column; }
+            .quest-table { font-size: 11px; }
+            .quest-table th, .quest-table td { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>⚡ DISCORD QUEST FARMER</h1>
+            <p class="subtitle">Auto Complete All Quests • Multi-Thread • Real-time Dashboard</p>
+        </div>
+
+        <!-- Login -->
+        <div class="login-section" id="loginSection">
+            <label>🔑 DISCORD TOKEN</label>
+            <div class="login-row">
+                <input type="password" id="tokenInput" placeholder="Nhập Discord Token của bạn...">
+                <button class="btn btn-primary" onclick="login()">CONNECT</button>
+            </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="user-info hidden" id="userInfo">
+            <div class="user-avatar" id="avatarLetter">U</div>
+            <div class="user-details">
+                <h3 id="username">Unknown</h3>
+                <span id="userId">ID: ---</span>
+            </div>
+            <div style="margin-left:auto;">
+                <button class="btn btn-danger btn-sm" onclick="logout()">DISCONNECT</button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row hidden" id="statsRow">
+            <div class="stat-card">
+                <div class="value" id="statTotal">0</div>
+                <div class="label">Total Quests</div>
+            </div>
+            <div class="stat-card green">
+                <div class="value" id="statDone">0</div>
+                <div class="label">Completed</div>
+            </div>
+            <div class="stat-card yellow">
+                <div class="value" id="statRunning">0</div>
+                <div class="label">Running</div>
+            </div>
+            <div class="stat-card red">
+                <div class="value" id="statFailed">0</div>
+                <div class="label">Failed</div>
+            </div>
+        </div>
+
+        <!-- Quest Table -->
+        <div class="hidden" id="questSection">
+            <div class="section-title">📋 LIVE QUEST PROGRESS</div>
+            <div style="overflow-x:auto;">
+                <table class="quest-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Quest Name</th>
+                            <th>Reward</th>
+                            <th>Progress</th>
+                            <th>Time Left</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Log -->
+        <div class="hidden" id="logSection">
+            <div class="section-title">📜 EVENT LOG</div>
+            <div class="log-section" id="logContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== STATE ====================
+        const API_BASE = '/api';
+        let token = '';
+        let user = null;
+        let quests = [];
+        let stats = { total: 0, done: 0, running: 0, failed: 0 };
+        let pollingInterval = null;
+        let logs = [];
+
+        // ==================== LOG ====================
+        function addLog(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            logs.push({ time, msg, type });
+            if (logs.length > 100) logs.shift();
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('logContainer');
+            container.innerHTML = logs.slice().reverse().map(l => 
+                `<div class="log-line ${l.type}">[${l.time}] ${l.msg}</div>`
+            ).join('');
+        }
+
+        // ==================== UI ====================
+        function showSection(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function hideSection(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function renderUserInfo() {
+            if (!user) return;
+            document.getElementById('username').textContent = user.username;
+            document.getElementById('userId').textContent = `ID: ${user.id}`;
+            document.getElementById('avatarLetter').textContent = user.username[0].toUpperCase();
+            showSection('userInfo');
+            hideSection('loginSection');
+        }
+
+        function renderStats() {
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statDone').textContent = stats.done;
+            document.getElementById('statRunning').textContent = stats.running;
+            document.getElementById('statFailed').textContent = stats.failed;
+            showSection('statsRow');
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function renderQuests() {
+            const tbody = document.getElementById('questTableBody');
+            
+            // Chỉ hiện quest đã enroll và chưa done
+            const activeQuests = quests.filter(q => q.enrolled && !q.completed);
+            
+            if (activeQuests.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2);">
+                    ✨ Không có quest nào đang chạy
+                </td></tr>`;
+            } else {
+                tbody.innerHTML = activeQuests.map((q, i) => {
+                    const progress = q.needed > 0 ? Math.min(100, (q.done / q.needed) * 100) : 0;
+                    const left = Math.max(0, q.needed - q.done);
+                    const statusClass = q.running ? 'badge-running' : q.completed ? 'badge-done' : q.failed ? 'badge-error' : 'badge-pending';
+                    const statusText = q.running ? '↻ RUNNING' : q.completed ? '✓ DONE' : q.failed ? '✗ FAILED' : 'PENDING';
+                    const progressClass = q.running ? 'running' : '';
+
+                    return `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td style="color:var(--cyan);">${q.name}</td>
+                            <td style="color:var(--magenta);">${q.reward}</td>
+                            <td style="min-width:150px;">
+                                <div style="font-size:11px;margin-bottom:3px;">${Math.floor(q.done)}s / ${q.needed}s</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill ${progressClass}" style="width:${progress}%;"></div>
+                                </div>
+                            </td>
+                            <td>${formatTime(left)}</td>
+                            <td><span class="badge ${statusClass}">${statusText}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            
+            showSection('questSection');
+        }
+
+        // ==================== API ====================
+        async function login() {
+            token = document.getElementById('tokenInput').value.trim();
+            if (!token) return alert('Vui lòng nhập token!');
+
+            addLog('Đang kết nối đến Discord...', 'info');
+
+            try {
+                const res = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+                const data = await res.json();
+
+                if (data.error) {
+                    addLog(`Lỗi: ${data.error}`, 'error');
+                    return;
+                }
+
+                user = data.user;
+                renderUserInfo();
+                addLog(`Đăng nhập thành công: ${user.username}`, 'success');
+                showSection('logSection');
+
+                // Bắt đầu polling
+                startPolling();
+            } catch (e) {
+                addLog(`Lỗi kết nối: ${e.message}`, 'error');
+            }
+        }
+
+        function logout() {
+            stopPolling();
+            token = '';
+            user = null;
+            quests = [];
+            stats = { total: 0, done: 0, running: 0, failed: 0 };
+            
+            hideSection('userInfo');
+            hideSection('statsRow');
+            hideSection('questSection');
+            hideSection('logSection');
+            showSection('loginSection');
+            
+            document.getElementById('tokenInput').value = '';
+            addLog('Đã ngắt kết nối', 'info');
+        }
+
+        function startPolling() {
+            fetchQuestData();
+            pollingInterval = setInterval(fetchQuestData, 3000);
+        }
+
+        function stopPolling() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        }
+
+        async function fetchQuestData() {
+            if (!token) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/quests`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.error) {
+                    addLog(`Lỗi: ${data.error}`, 'error');
+                    return;
+                }
+
+                quests = data.quests || [];
+                stats = data.stats || stats;
+                
+                renderStats();
+                renderQuests();
+
+                // Log quest mới hoàn thành
+                const justDone = quests.filter(q => q.completed && !q._logged);
+                justDone.forEach(q => {
+                    addLog(`✅ Hoàn thành: ${q.name} - Nhận: ${q.reward}`, 'success');
+                    q._logged = true;
+                });
+
+            } catch (e) {
+                console.error('Poll error:', e);
+            }
+        }
+    </script>
+</body>
+</html>
